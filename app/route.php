@@ -26,13 +26,24 @@
 </head>
 
 <body>
+    
+    <a href ="/index.php">zurück</a>
 
     <h1><?php echo $route['name'];?></h1>
     <img src ="..<?php echo $route['image'];?>">
     <p><?php echo $route['description'];?></p>
     <p><?php echo $route['durance_minutes'];?> Minuten</p>
     <p><?php echo $route['distance_meter'];?> Meter</p>
-    <a href = "start.php">Route starten</a>
+    
+    <?php $tags = get_route_tags($route_id); 
+    echo "<p>Tags : ";
+    while ($line = mysqli_fetch_array($tags)) {
+        echo $line['tag_name']." ";
+    }
+    echo "</p>";
+    ?>
+    
+    <a href = "start.php?id=<?php echo $route_id; ?>">Route starten</a>
     
     
 </body>
