@@ -26,23 +26,20 @@
     <h1>waythere stories </h1>
     
     <div>
-    
+        
         <?php
             $all_routes = get_all_routes();
-            echo $all_routes;
-        
-            while($line = mysqli_fetch_array($all_routes)) {
+            while ($line = mysqli_fetch_array($all_routes)) {
             // Anfang der Schleife, die aus jeder Ergebniszeile einen eigenen Routen-Eintrag generiert
         ?>
         
-            <article a href="app/route.php?id=<?php echo $line['route_id']; ?>">
-                    <h2><?php echo $line['name']; ?></h2>
-                    <p><?php echo $line ['description']; ?></p>
-            </article>
+                <a href="app/route.php?id=<?php echo $line['route_id']; ?>"><?php echo $line['name'];?></a>
+                <br>
         
         <?php
-            }       // Ende der Schleife für Routen-Einträge
+            }           // Ende der Schleife
         ?>
+
     </div>
         
     <!--
