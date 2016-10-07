@@ -57,7 +57,16 @@ function get_coordinates($route_id, $position) {
     $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id AND belongsto.number = $position;";
     
     return get_result($sql);
-    
 }
+
+// Abfragen der Spezifikationen für die Google API
+function get_api_settings() {
+    
+    $specs = ['AIzaSyBtXwlLuDB7czfc', 'walking', 'de'];
+    return $specs;
+}
+
+// Struktur des Google API HTTP Requests :
+// https://maps.googleapis.com/maps/api/directions/xml?origin=46.852839,9.513134&destination={latitude,longitude}&mode={travel_mode}&language={language}&key={our_key}
 
 ?>
