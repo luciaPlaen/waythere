@@ -41,17 +41,7 @@
     
         <a href ="route.php">abbrechen</a>
     
-        <div id="pos">
-        Deine Position wird ermittelt...
-        </div>
-    
-        <script>
-            navigator.geolocation.getCurrentPosition(function(position){ 
-                document.getElementById('pos').innerHTML = 'Latitude: '+position.coords.latitude+' / Longitude: '+position.coords.longitude;
-            }, function(){
-                document.getElementById('pos').innerHTML = 'Deine Position konnte leider nicht ermittelt werden';
-            });
-        </script>
+    <a href = "standort_test.html">Standort ermitteln</a>
     
 </body>
 </html>
