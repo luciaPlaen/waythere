@@ -61,8 +61,13 @@ function get_coordinates($route_id, $position) {
 
 // Abfragen der Spezifikationen für die Google API
 function get_api_settings() {
-    
-    $specs = ['AIzaSyBtXwlLuDB7czfc', 'walking', 'de'];
+    $sql_key = "SELECT Api_specs.content FROM Api_specs WHERE Api_specs.spec_id = 1;";
+    $specs_key = mysqli_fetch_array(get_result($sql_key), MYSQLI_NUM);
+    $sql_mode = "SELECT Api_specs.content FROM Api_specs WHERE Api_specs.spec_id = 2;";
+    $specs_mode = mysqli_fetch_array(get_result($sql_mode), MYSQLI_NUM);
+    $sql_language = "SELECT Api_specs.content FROM Api_specs WHERE Api_specs.spec_id = 3;";
+    $specs_language = mysqli_fetch_array(get_result($sql_language), MYSQLI_NUM);
+    $specs = [$specs_key[0], $specs_mode[0], $specs_language[0]];
     return $specs;
 }
 
