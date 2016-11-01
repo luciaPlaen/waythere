@@ -8,23 +8,11 @@
     } else header("Location:../index.php");     // ansonsten wird der User zurück auf die Routenübersicht verwiesen
 
         
-        $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
-        $destination = mysqli_fetch_array(get_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-        $destinationLatitude = $destination['latitude'];
-        $destinationLongitude = $destination['longitude'];
+    $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
+    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
 
-
-    if(isset($_GET['posLatitude'&&'posLongitude'])) {
-         $positionLatitude = $_GET['posLatitude'];
-         $positionLongitude = $_GET['posLongitude'];
-    
-         $apiSettings = get_api_settings();
-         $apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin=".$positionLatitude.",".$positionLongitude."&destination=".$destinationLatitude.",".$destinationLongitude."&mode=".$apiSettings[1]."&language=".$apiSettings[2]."&key=".$apiSettings[0];
-         echo $apiRequest;
-    
-         $xml = file_get_contents($apiRequest);
-         echo $xml;
-     }
+    $destinationLatitude = $destination['latitude'];
+    $destinationLongitude = $destination['longitude'];
 
     ?>
 
@@ -51,31 +39,39 @@
     <h1> Routenführung </h1>
     
     <div id = "xml">leer</div>
-    <p id = "posLat"></p>
-    <p id = "posLong"></p>
+    <p id = "posLat">posLat</p>
+    <p id = "posLong">posLong</p>
     
     <script>
-        
+
         navigator.geolocation.getCurrentPosition(function(position){ 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
             document.getElementById("posLat").innerHTML = positionLatitude;
             document.getElementById("posLong").innerHTML = positionLongitude;
-
-            function sendPosition() {
+        }, function() {
+            document.getElementById("posLat").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
+            document.getElementById("posLong").innerHTML = " ";
+        });
+        
+        /*
+        document.getElementById("xml").innerHTML = "xml_request.php?id=<?php echo $route_id; ?>posLatitude=" + positionLatitude + "&posLongitude=" + positionLongitude;
+        
+            function xml_request() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("xml").innerHTML = "gesendet!";
+                        //var xml =this.responseText;
+                        document.getElementById("xml").innerHTML = this.responseText;
                     }
                 };
-                var url = "http://555712-3.web.fh-htwchur.ch/app/guide.php?id<?php echo $route_id; ?>posLatitude="+positionLatitude+"&posLongitude="+positionLongitude+".php";
                 xhttp.open("GET", url, true);
                 xhttp.send();
             } 
-                           
-            sendPosition();
-        });
+        
+            xml_request();
+            */
         
     </script>
     

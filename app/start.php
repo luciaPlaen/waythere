@@ -33,7 +33,7 @@
         <?php
             $nextSpot = 1;
     
-            $destination = mysqli_fetch_array(get_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
+            $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
             echo "destination latitude: ".$destination['latitude']."<br>"."destination longitude: ".$destination['longitude'];
             $api_settings = get_api_settings();
         ?>

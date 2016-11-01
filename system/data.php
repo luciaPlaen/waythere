@@ -50,12 +50,11 @@ function get_route_tags($id) {
     return get_result($sql);
 }
 
-// Abfragen der Koordinatien eines Spots
-function get_coordinates($route_id, $position) {
+// Abfragen der Koordinaten eines Spots
+function get_spot_coordinates($route_id, $position) {
     
     $sql = "SELECT Spot.latitude, Spot.longitude FROM Spot, belongsto ";
     $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id AND belongsto.number = $position;";
-    
     return get_result($sql);
 }
 
