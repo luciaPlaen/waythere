@@ -9,8 +9,8 @@
 
         
     $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
-    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
 
+    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
     $destinationLatitude = $destination['latitude'];
     $destinationLongitude = $destination['longitude'];
 
@@ -47,8 +47,18 @@
     <p id = "request">http-request ...</p>
     <p id = "xml">xml ...</p>
     
+    
     <script>
         
+        
+        function instructions() {
+            var step_counter = 0;
+            document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;
+        }
+        
+        
+        function spot_request() {
+            
         navigator.geolocation.getCurrentPosition(function(position){ 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
@@ -56,7 +66,8 @@
             document.getElementById("destLong").innerHTML = "<?php echo $destinationLongitude; ?>";
             document.getElementById("posLat").innerHTML = positionLatitude;
             document.getElementById("posLong").innerHTML = positionLongitude;
-            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destination['latitude']; ?>,<?php echo $destination['longitude']; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
+            
+            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destinationLatitude; ?>,<?php echo $destinationLongitude; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;
             
             //var xml = file_get_contents(apiRequest);
@@ -66,14 +77,19 @@
             var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                    
-                        //document.getElementById("xml").innerHTML = "gesendet!";
+
                         var xml =this.responseText;
-                        document.getElementById("xml").innerHTML = xml;
+                        console.log(xml);
+                        // document.getElementById("xml").innerHTML = "empfangen!";
+                        
+                        parser = new DOMParser();
+                        xmlDoc = parser.parseFromString(xml,"text/xml");
+
+                        instructions ();
                         
                     }
                 };
-                xhttp.open("GET", "xml_request.php", true);
+                xhttp.open("GET", "xml_request.php?url="+apiRequest, true);
                 xhttp.send();
             
             
@@ -81,6 +97,9 @@
             document.getElementById("posLat").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
             document.getElementById("posLong").innerHTML = " ";
         });
+        }
+        
+        spot_request();
         
     </script>
     
