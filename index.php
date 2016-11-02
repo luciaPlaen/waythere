@@ -16,6 +16,7 @@
 <title>waythere stories</title>
     
     <!-- Links -->
+    <link href="../style/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="style/style.css" rel="stylesheet" type="text/css">
     
 </head>
