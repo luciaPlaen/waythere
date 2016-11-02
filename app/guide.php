@@ -50,6 +50,15 @@
     
     <script>
         
+        
+        function instructions() {
+            var step_counter = 0;
+            document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;
+        }
+        
+        
+        function spot_request() {
+            
         navigator.geolocation.getCurrentPosition(function(position){ 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
@@ -68,11 +77,15 @@
             var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                    
-                        //document.getElementById("xml").innerHTML = "gesendet!";
+
                         var xml =this.responseText;
                         console.log(xml);
-                        document.getElementById("xml").innerHTML = "empfangen!";
+                        // document.getElementById("xml").innerHTML = "empfangen!";
+                        
+                        parser = new DOMParser();
+                        xmlDoc = parser.parseFromString(xml,"text/xml");
+
+                        instructions ();
                         
                     }
                 };
@@ -84,6 +97,9 @@
             document.getElementById("posLat").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
             document.getElementById("posLong").innerHTML = " ";
         });
+        }
+        
+        spot_request();
         
     </script>
     
