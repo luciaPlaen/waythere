@@ -55,18 +55,54 @@
         function instructions() {
             var step_counter = 0;
             document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;
+            
+            
+ /*
+var id, ziel, options;
+//Verfolgen beginnen
+id = navigator.geolocation.watchCurrentPosition(verfolgePosition);
+ 
+function verfolgePosition(pos) {
+  var aktuell = pos.coords;
+ 
+  if (ziel.latitude === aktuell.latitude && ziel.longitude === aktuell.longitude) {
+    console.log('Sie haben Ihr Ziel erreicht');
+    //Verfolgen beenden
+    navigator.geolocation.clearWatch(id);
+  }
+}
+ 
+ziel = {
+  latitude : 0,
+  longitude: 0
+};
+ 
+options = {
+  enableHighAccuracy: false,
+  timeout: 5000,
+  maximumAge: 0
+};
+*/         
+            
         }
         
         
         function spot_request() {
             
-        navigator.geolocation.getCurrentPosition(function(position){ 
+        /* 
+        if(navigator.geolocation) {
+            alert('Geolocation verfügbar');
+        } else {
+            alert('Geolocation nicht verfügbar');
+        } */
+            
+        navigator.geolocation.watchPosition(function(position){ 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
             document.getElementById("destLat").innerHTML = "<?php echo $destinationLatitude; ?>";
             document.getElementById("destLong").innerHTML = "<?php echo $destinationLongitude; ?>";
-            document.getElementById("posLat").innerHTML = positionLatitude;
-            document.getElementById("posLong").innerHTML = positionLongitude;
+            document.getElementById("posLat").innerHTML = position.Latitude;
+            document.getElementById("posLong").innerHTML = position.Longitude;
             
             var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destinationLatitude; ?>,<?php echo $destinationLongitude; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;
