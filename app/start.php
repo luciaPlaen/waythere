@@ -19,8 +19,8 @@
 <head>
     
     <!-- Links -->
+    <link href="../style/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="../style/style.css" rel="stylesheet" type="text/css">
-
     <meta charset="utf-8">
     <title>waythere stories - start</title>
     
