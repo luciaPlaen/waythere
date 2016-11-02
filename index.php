@@ -35,22 +35,14 @@
         
                 <a href="app/route.php?id=<?php echo $line['route_id']; ?>"><?php echo $line['name'];?></a>
                 <br>
+                <p><?php echo $line['description']; ?></p>
+                <br>
         
         <?php
             }           // Ende der Schleife
         ?>
 
     </div>
-        
-    <!--
-    <article>
-        <a href="app/route.php">Chur</a>
-    </article>
-    
-    <article>
-        <a href="app/route.php">Bern</a>
-    </article>
-    -->
 
 </body>
 </html>

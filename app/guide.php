@@ -9,8 +9,8 @@
 
         
     $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
-    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
 
+    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
     $destinationLatitude = $destination['latitude'];
     $destinationLongitude = $destination['longitude'];
 
@@ -47,6 +47,7 @@
     <p id = "request">http-request ...</p>
     <p id = "xml">xml ...</p>
     
+    
     <script>
         
         navigator.geolocation.getCurrentPosition(function(position){ 
@@ -56,7 +57,8 @@
             document.getElementById("destLong").innerHTML = "<?php echo $destinationLongitude; ?>";
             document.getElementById("posLat").innerHTML = positionLatitude;
             document.getElementById("posLong").innerHTML = positionLongitude;
-            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destination['latitude']; ?>,<?php echo $destination['longitude']; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
+            
+            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destinationLatitude; ?>,<?php echo $destinationLongitude; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;
             
             //var xml = file_get_contents(apiRequest);
@@ -69,11 +71,12 @@
                     
                         //document.getElementById("xml").innerHTML = "gesendet!";
                         var xml =this.responseText;
-                        document.getElementById("xml").innerHTML = xml;
+                        console.log(xml);
+                        document.getElementById("xml").innerHTML = "empfangen!";
                         
                     }
                 };
-                xhttp.open("GET", "xml_request.php", true);
+                xhttp.open("GET", "xml_request.php?url="+apiRequest, true);
                 xhttp.send();
             
             
