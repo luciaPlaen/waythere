@@ -14,6 +14,8 @@
     $destinationLatitude = $destination['latitude'];
     $destinationLongitude = $destination['longitude'];
 
+    $api_settings = get_api_settings();
+
     ?>
 
 
@@ -38,30 +40,39 @@
     
     <h1> Routenführung </h1>
     
-    <div id = "xml">leer</div>
     <p id = "posLat">posLat</p>
     <p id = "posLong">posLong</p>
+    <p id = "destLat">destLat</p>
+    <p id = "destLong">destLong</p>
+    <p id = "request">http-request ...</p>
+    <p id = "xml">xml ...</p>
     
     <script>
         
         navigator.geolocation.getCurrentPosition(function(position){ 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
+            document.getElementById("destLat").innerHTML = "<?php echo $destinationLatitude; ?>";
+            document.getElementById("destLong").innerHTML = "<?php echo $destinationLongitude; ?>";
             document.getElementById("posLat").innerHTML = positionLatitude;
             document.getElementById("posLong").innerHTML = positionLongitude;
+            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destination['latitude']; ?>,<?php echo $destination['longitude']; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
+            document.getElementById("request").innerHTML = apiRequest;
             
-            // document.getElementById("xml").innerHTML = "xml_request.php?id=<?php echo $route_id; ?>posLatitude=" + positionLatitude + "&posLongitude=" + positionLongitude;
+            //var xml = file_get_contents(apiRequest);
+            //document.getElementById("xml").innerHTML = xml;
             
+
             var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                     
-                        document.getElementById("xml").innerHTML = "gesendet!";
-                        //var xml =this.responseText;
-                        //document.getElementById("xml").innerHTML = this.responseText;
+                        //document.getElementById("xml").innerHTML = "gesendet!";
+                        var xml =this.responseText;
+                        document.getElementById("xml").innerHTML = xml;
+                        
                     }
                 };
-                // var url = "xml_request.php?id=<?php //echo $route_id; ?>posLatitude=" + positionLatitude + "&posLongitude=" + positionLongitude;
                 xhttp.open("GET", "xml_request.php", true);
                 xhttp.send();
             

@@ -1,13 +1,7 @@
 <?php
-
-         $positionLatitude = $_GET['posLatitude'];
-         $positionLongitude = $_GET['posLongitude'];
     
-         $apiSettings = get_api_settings();
-    
-         $apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin=".$positionLatitude.",".$positionLongitude."&destination=".$destinationLatitude.",".$destinationLongitude."&mode=".$apiSettings[1]."&language=".$apiSettings[2]."&key=".$apiSettings[0];
-    
+        $apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin=46.8536741,9.5143009&destination=46.9475,7.45137&mode=walking&language=de&key=AIzaSyBtXwlLuDB7czfcUqNaeBACF2RIdBHZaiE";
          $xml = file_get_contents($apiRequest);
-         return $xml;
+         echo $xml;
 
 ?>

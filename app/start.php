@@ -5,7 +5,6 @@
     // die per GET (in der URL) übergebene id wird als $route_id gespeichert
     $route_id = $_GET['id'];
     } else header("Location:../index.php");     // ansonsten wird der User zurück auf die Routenübersicht verwiesen
-
 ?>
 
 
@@ -38,16 +37,17 @@
             $api_settings = get_api_settings();
         ?>
     
-        <p>https://maps.googleapis.com/maps/api/directions/xml?origin=46.852839,9.513134&destination=<?php echo $destination[0]; ?>,<?php echo $destination[1]; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?></p>
+        <p id="request">Http-Request ...</p>
     
     <div id="pos">
         Deine Position wird ermittelt...
     </div>
     
     <script>
-
-        navigator.geolocation.getCurrentPosition(function(position){ 
-            document.getElementById('pos').innerHTML = 'Latitude: '+position.coords.latitude+' / Longitude: '+position.coords.longitude;
+        
+        navigator.geolocation.getCurrentPosition(function(position){
+            document.getElementById('pos').innerHTML = 'position latitude: '+position.coords.latitude+' / position longitude: '+position.coords.longitude;
+            document.getElementById('request').innerHTML = "https://maps.googleapis.com/maps/api/directions/xml?origin="+position.coords.latitude+","+position.coords.longitude+"&destination=<?php echo $destination['latitude']; ?>,<?php echo $destination['longitude']; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
         }, function(){
                 document.getElementById('pos').innerHTML = 'Deine Position konnte leider nicht ermittelt werden';
             });
