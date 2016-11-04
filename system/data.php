@@ -7,7 +7,7 @@ data.php ist eine Sammlung aller wiederkehrend verwendeter Funktionen, was den V
 
 // Verbindung zur Datenbank:
 function get_db_connection() {
-		$db = mysqli_connect('localhost', '555712_3_1', 'bWvrijhZ@1cI', '555712_3_1')         //>> (server, user, pw, db)
+		$db = mysqli_connect('beburkar.mysql.db.internal', 'beburkar_bealu', 'x1tbv5Bq', 'beburkar_waythere')         //>> (server, user, pw, db)
  		 or die('Verbindung mit Datenbank-Server fehlgeschlagen.');
   		//mysqli_query($db, "SET NAMES 'utf8'");
 		return $db;
