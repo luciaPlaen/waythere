@@ -59,28 +59,28 @@
             destinationLongitude.push(<?php echo $destination['longitude']; ?>);
         }
         document.getElementById("testing").innerHTML = "Lat = "+destinationLatitude+"Long = "+destinationLongitude;
+        //start_guide(1);
         
         
         
-        function start_guide() {
+        function start_guide(nextSpot) {
+            //for (spot = 1; spot <= <?php //echo $lastSpot; ?>; spot++){}
             
-            for (spot = 1; spot <= <?php echo $lastSpot; ?>; spot++){}
+            alert("Wir sind bei"+nextSpot);
             
-            if nextSpot == <?php echo $lastSpot; ?> {
+            if (nextSpot == <?php echo $lastSpot; ?>) {
                 alert("die Routenführung ist beendet!");
             } else {
                 nextSpot = nextSpot + 1;
-                start_guide();
+                start_guide(nextSpot);
             }
-            
         }
     
         
         // Eine einmalige Standort-Abfrage wird durchgeführt, um die Zugriffsberechtigung gezielt abzufragen >> anschliessend startet die Routenführung (Funktion)
          navigator.geolocation.getCurrentPosition(function(position){
              document.getElementById("geolocation_error").innerHTML = "alles bestens - starte jetzt die Routenführung.";
-             var nextSpot = 1;
-             start_guide();
+             start_guide(1);
          }, function() {
             document.getElementById("geolocation_error").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
         });
@@ -89,7 +89,7 @@
         
         
         
-        
+        /*
         function instruction() {
             var step_counter = 0;
             document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;        
@@ -101,12 +101,12 @@
 
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
-            document.getElementById("destLat").innerHTML = "<?php echo $destinationLatitude; ?>";
-            document.getElementById("destLong").innerHTML = "<?php echo $destinationLongitude; ?>";
+            document.getElementById("destLat").innerHTML = "<?php //echo $destinationLatitude; ?>";
+            document.getElementById("destLong").innerHTML = "<?php //echo $destinationLongitude; ?>";
             document.getElementById("posLat").innerHTML = positionLatitude;
             document.getElementById("posLong").innerHTML = positionLongitude;
             
-            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destinationLatitude; ?>,<?php echo $destinationLongitude; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
+            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php //echo $destinationLatitude; ?>,<?php //echo $destinationLongitude; ?>&mode=<?php //echo $api_settings[1]; ?>&language=<?php //echo $api_settings[2]; ?>&key=<?php //echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;
             
 
@@ -129,6 +129,7 @@
                 xhttp.send();
     
         }
+        */
         
     </script>
     
