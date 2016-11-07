@@ -7,8 +7,16 @@
     $route_id = $_GET['id'];
     } else header("Location:../index.php");     // ansonsten wird der User zurück auf die Routenübersicht verwiesen
 
+        
+    $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
+
+    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
+    $destinationLatitude = $destination['latitude'];
+    $destinationLongitude = $destination['longitude'];
+
     $api_settings = get_api_settings();
-?>
+
+    ?>
 
 
 
@@ -25,7 +33,7 @@
     <link href="../style/style.css" rel="stylesheet" type="text/css">
 
     <meta charset="utf-8">
-    <title>waythere stories - guide</title>
+    <title>waythere stories - funktionstest</title>
     
 </head>
 
@@ -41,32 +49,10 @@
     <p id = "xml">xml ...</p>
     
     
-    <?php
-    
-    $lastSpot = count_spots($route_id);
-    
-  for ($nextSpot = 1; $nextSpot<=$lastSpot; $nextSpot++) {
-       echo "nextSpot =".$nextSpot;
-       
-       $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-       $destinationLatitude = $destination['latitude'];
-       $destinationLongitude = $destination['longitude'];
-      
-      // check_position($destinationLatitude, $destinationLongitude);
-  }
-    /*
-    $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
-
-    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-    $destinationLatitude = $destination['latitude'];
-    $destinationLongitude = $destination['longitude'];
-*/
-    ?>
-    
     <script>
         
         
-        function instruction() {
+        function instructions() {
             var step_counter = 0;
             document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;        
             
@@ -101,7 +87,7 @@
                         parser = new DOMParser();
                         xmlDoc = parser.parseFromString(xml,"text/xml");
 
-                        instruction();
+                        instructions ();
                         
                     }
                 };

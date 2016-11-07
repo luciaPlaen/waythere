@@ -56,7 +56,8 @@
     
     <br>
     <a href = "guide.php?id=<?php echo $route_id; ?>">Routenführung starten</a>
-    
+    <br>
+    <a href = "funktionstest.php?id=<?php echo $route_id; ?>">Funktionen testen</a>
     <br>
     <a href ="route.php">abbrechen</a>
     

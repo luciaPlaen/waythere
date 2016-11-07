@@ -50,6 +50,12 @@ function get_route_tags($id) {
     return get_result($sql);
 }
 
+function count_spots($route_id){
+    $sql = "SELECT COUNT(belongsto.spot_id) FROM belongsto WHERE belongsto.route_id = $route_id;";
+    $count = mysqli_fetch_array(get_result($sql));
+    return $count[0]; 
+}
+
 // Abfragen der Koordinaten eines Spots
 function get_spot_coordinates($route_id, $position) {
     
