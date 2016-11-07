@@ -7,6 +7,8 @@
     $route_id = $_GET['id'];
     } else header("Location:../index.php");     // ansonsten wird der User zurück auf die Routenübersicht verwiesen
 
+    $lastSpot = count_spots($route_id);
+    $nextSpot = 1;
     $api_settings = get_api_settings();
 ?>
 
@@ -33,6 +35,8 @@
     
     <h1> Routenführung </h1>
     <br>
+    <p id = "geolocation_error"></p>
+    <p id = "testing"></p>
     <p id = "posLat">posLat</p>
     <p id = "posLong">posLong</p>
     <p id = "destLat">destLat</p>
@@ -40,30 +44,50 @@
     <p id = "request">http-request ...</p>
     <p id = "xml">xml ...</p>
     
-    
-    <?php
-    
-    $lastSpot = count_spots($route_id);
-    
-  for ($nextSpot = 1; $nextSpot<=$lastSpot; $nextSpot++) {
-       echo "nextSpot =".$nextSpot;
-       
-       $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-       $destinationLatitude = $destination['latitude'];
-       $destinationLongitude = $destination['longitude'];
-      
-      // check_position($destinationLatitude, $destinationLongitude);
-  }
-    /*
-    $nextSpot = 1;      // beschreibt die aktuell nächste Station einer Route - das nächste Ziel der Routenführung
-
-    $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-    $destinationLatitude = $destination['latitude'];
-    $destinationLongitude = $destination['longitude'];
-*/
-    ?>
-    
     <script>
+        
+        
+        // Abfragen der Koordinaten jedes zur Route gehörigen Spots >> Speichern der Werte in 2 Arrays (Latitude & Longitude) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird der einfacheren Handhabung halber ein Anfangswert (0) mitgegeben, um diesen Umstand zu erreichen)
+        var destinationLatitude = [0];
+         var destinationLongitude = [0];
+        for (spot = 1; spot <= <?php echo $lastSpot; ?>; spot++){
+            <?php
+                $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
+                $nextSpot = $nextSpot + 1;
+            ?>
+            destinationLatitude.push(<?php echo $destination['latitude']; ?>);
+            destinationLongitude.push(<?php echo $destination['longitude']; ?>);
+        }
+        document.getElementById("testing").innerHTML = "Lat = "+destinationLatitude+"Long = "+destinationLongitude;
+        
+        
+        
+        function start_guide() {
+            
+            for (spot = 1; spot <= <?php echo $lastSpot; ?>; spot++){}
+            
+            if nextSpot == <?php echo $lastSpot; ?> {
+                alert("die Routenführung ist beendet!");
+            } else {
+                nextSpot = nextSpot + 1;
+                start_guide();
+            }
+            
+        }
+    
+        
+        // Eine einmalige Standort-Abfrage wird durchgeführt, um die Zugriffsberechtigung gezielt abzufragen >> anschliessend startet die Routenführung (Funktion)
+         navigator.geolocation.getCurrentPosition(function(position){
+             document.getElementById("geolocation_error").innerHTML = "alles bestens - starte jetzt die Routenführung.";
+             var nextSpot = 1;
+             start_guide();
+         }, function() {
+            document.getElementById("geolocation_error").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
+        });
+        
+        
+        
+        
         
         
         function instruction() {
@@ -73,9 +97,8 @@
         }
         
         
-        function spot_request() {
-            
-        navigator.geolocation.getCurrentPosition(function(position){ 
+        function guide() {
+
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
             document.getElementById("destLat").innerHTML = "<?php echo $destinationLatitude; ?>";
@@ -85,9 +108,6 @@
             
             var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php echo $destinationLatitude; ?>,<?php echo $destinationLongitude; ?>&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;
-            
-            //var xml = file_get_contents(apiRequest);
-            //document.getElementById("xml").innerHTML = xml;
             
 
             var xhttp = new XMLHttpRequest();
@@ -107,15 +127,8 @@
                 };
                 xhttp.open("GET", "xml_request.php?url="+apiRequest, true);
                 xhttp.send();
-            
-            
-        }, function() {
-            document.getElementById("posLat").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
-            document.getElementById("posLong").innerHTML = " ";
-        });
+    
         }
-        
-        spot_request();
         
     </script>
     
