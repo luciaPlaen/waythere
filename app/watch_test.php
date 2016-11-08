@@ -22,9 +22,8 @@
     <p id = "tarLat">tarLat</p>
     <p id = "tarLng">tarLng</p>
 
+    
 <script>
-
-    document.getElementById('posLat').innerHtml = "hi";
     
 function success(pos) {
   var crd = pos.coords;
@@ -57,6 +56,8 @@ var options = {
 var watchId = navigator.geolocation.watchPosition(success, error, options);
 
 </script>
+    
+
     
 </body>
 </html>
