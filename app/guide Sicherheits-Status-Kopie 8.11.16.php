@@ -3,12 +3,12 @@
 
 
     if(isset($_GET['id'])) {
-    // die per GET (in der URL) übergebene id wird als $route_id gespeichert
-    $route_id = $_GET['id'];
+        // die per GET (in der URL) übergebene id wird als $route_id gespeichert
+        $route_id = $_GET['id'];
     } else header("Location:../index.php");     // ansonsten wird der User zurück auf die Routenübersicht verwiesen
 
     $lastSpot = count_spots($route_id);
-    $nextSpot = 1;
+    $spotCount = 1;
     $api_settings = get_api_settings();
 ?>
 
@@ -39,8 +39,7 @@
     <p id = "testing"></p>
     <p id = "posLat">posLat</p>
     <p id = "posLong">posLong</p>
-    <p id = "destLat">destLat</p>
-    <p id = "destLong">destLong</p>
+    <p id = "spotDest">spotDestLat</p>
     <p id = "request">http-request ...</p>
     <p id = "xml">xml ...</p>
     
@@ -50,43 +49,70 @@
     
     <script>
         
-        // Abfragen der Koordinaten jedes zur Route gehörigen Spots >> Speichern der Werte in 2 Arrays (Latitude & Longitude) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird der einfacheren Handhabung halber ein Anfangswert (0) mitgegeben, um diesen Umstand zu erreichen)
-        var destinationLatitude = [0];
-         var destinationLongitude = [0];
-        for (spot = 1; spot <= <?php echo $lastSpot; ?>; spot++){
-            <?php
-                $destination = mysqli_fetch_array(get_spot_coordinates($route_id, $nextSpot), MYSQLI_ASSOC);
-                $nextSpot = $nextSpot + 1;
-            ?>
-            destinationLatitude.push(<?php echo $destination['latitude']; ?>);
-            destinationLongitude.push(<?php echo $destination['longitude']; ?>);
-        }
-        document.getElementById("testing").innerHTML = "Lat = "+destinationLatitude+"Long = "+destinationLongitude;
-        //start_guide(1);
         
+        // Abfragen der Koordinaten jedes zur Route gehörigen Spots >> Speichern der Werte in 2 Arrays (Latitude & Longitude) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird der einfacheren Handhabung halber ein Anfangswert (0) mitgegeben, um diesen Umstand zu erreichen)
+        var spotsLatitude = [0];
+        var spotsLongitude = [0];
+        <?php
+            $all_spot_coordinates = get_all_spot_coordinates($route_id);
+            while ($line = mysqli_fetch_array($all_spot_coordinates, MYSQLI_ASSOC)) { ?>
+                spotsLatitude.push(<?php echo $line['latitude']; ?>);
+                spotsLongitude.push(<?php echo $line['longitude']; ?>);
+        <?php
+            } ?>
+        document.getElementById("testing").innerHTML = "Lat = "+spotsLatitude+" und Long = "+spotsLongitude;
+        
+        
+        function watchSuccess(position, nextSpot) {
+            var positionLatitude = position.coords.latitude;
+            var positionLongitude = position.coords.longitude;
+            document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
+            document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
+            console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
+
+            // Basteln und Abschicken des http-Requests
+            // Auswerten des XML-Files
+            // Definition der nächsten Step-Destination-Koordinaten
+            
+            // Ausgabe der Routenführungs-Anweisung
+            
+            if (positionLatitude != spotsLatitude[nextSpot]) {
+                console.log ("Position stimmt nicht mit Ziel überein!");
+            } else {
+                alert ("Position stimmt mit Ziel überein!");
+                alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
+                
+                if (nextSpot == <?php echo $lastSpot; ?>) {
+                    alert("die Routenführung ist beendet!");
+                } else {
+                    nextSpot = nextSpot + 1;
+                    clearWatch(watchId);
+                    start_guide(nextSpot);
+                }
+            }
+        }
+        
+        function watchError(error) {
+            console.warn('ERROR(' + error.code + '): ' + error.message);
+        }
         
         // eigentliche Funktion der Routenführung und Beginn der Schleife, die von Spot zu Spot navigiert
         function start_guide(nextSpot) {
-            
             alert("Wir sind bei"+nextSpot);
-            
-            if (nextSpot == <?php echo $lastSpot; ?>) {
-                alert("die Routenführung ist beendet!");
-            } else {
-                nextSpot = nextSpot + 1;
-                start_guide(nextSpot);
-            }
+            document.getElementById("postDest").innerHTML = "Nächster Spot bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
+            watchId = navigator.geolocation.watchPosition(function(position) {
+                watchSuccess(position, nextSpot);
+            }, watchError);
         }
     
         
         // Eine einmalige Standort-Abfrage wird durchgeführt, um die Zugriffsberechtigung gezielt abzufragen >> anschliessend startet die Routenführung (Funktion)
          navigator.geolocation.getCurrentPosition(function(position){
-             document.getElementById("geolocation_error").innerHTML = "alles bestens - starte jetzt die Routenführung.";
+             alert("Position konnte erfolgreich ermittelt werden.");
              start_guide(1);
          }, function() {
             document.getElementById("geolocation_error").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
         });
-        
         
         
         
@@ -96,14 +122,6 @@
             var step_counter = 0;
             document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;        
          }
-        
-
-            var positionLatitude = position.coords.latitude;
-            var positionLongitude = position.coords.longitude;
-            document.getElementById("destLat").innerHTML = "<?php //echo $destinationLatitude; ?>";
-            document.getElementById("destLong").innerHTML = "<?php //echo $destinationLongitude; ?>";
-            document.getElementById("posLat").innerHTML = positionLatitude;
-            document.getElementById("posLong").innerHTML = positionLongitude;
             
             var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php //echo $destinationLatitude; ?>,<?php //echo $destinationLongitude; ?>&mode=<?php //echo $api_settings[1]; ?>&language=<?php //echo $api_settings[2]; ?>&key=<?php //echo $api_settings[0]; ?>";
             document.getElementById("request").innerHTML = apiRequest;

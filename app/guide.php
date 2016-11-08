@@ -37,10 +37,11 @@
     <br>
     <p id = "geolocation_error"></p>
     <p id = "testing"></p>
+    <br>
+    <p id = "spotDest">spotDes</p>
     <p id = "posLat">posLat</p>
     <p id = "posLong">posLong</p>
-    <p id = "destLat">destLat</p>
-    <p id = "destLong">destLong</p>
+    <br>
     <p id = "request">http-request ...</p>
     <p id = "xml">xml ...</p>
     
@@ -61,18 +62,28 @@
                 spotsLongitude.push(<?php echo $line['longitude']; ?>);
         <?php
             } ?>
-        document.getElementById("testing").innerHTML = "Lat = "+spotsLatitude+"Long = "+spotsLongitude;
+        document.getElementById("testing").innerHTML = "spotsLatitude = "+spotsLatitude+" & spotsLongitude = "+spotsLongitude;
         
         
         function watchSuccess(position, nextSpot) {
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
-            document.getElementById("posLat").innerHTML = positionLatitude;
-            document.getElementById("posLong").innerHTML = positionLongitude;
+            document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
+            document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
             console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
 
+            // Basteln und Abschicken des http-Requests
+            // Auswerten des XML-Files
+            // Definition der nächsten Step-Destination-Koordinaten
+            
+            // Vergleichen >> PUFFERZONE BERÜCKSICHTIGEN !!!
+            
             if (positionLatitude != spotsLatitude[nextSpot]) {
                 console.log ("Position stimmt nicht mit Ziel überein!");
+                
+                // Überprüfung, ob Anweisung noch dieselbe
+                // evtl Ausgabe der Routenführungs-Anweisung (mit Bild)
+                
             } else {
                 alert ("Position stimmt mit Ziel überein!");
                 alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
@@ -94,8 +105,7 @@
         // eigentliche Funktion der Routenführung und Beginn der Schleife, die von Spot zu Spot navigiert
         function start_guide(nextSpot) {
             alert("Wir sind bei"+nextSpot);
-            document.getElementById("destLat").innerHTML = spotsLatitude[nextSpot];
-            document.getElementById("destLong").innerHTML = spotsLatitude[nextSpot];
+            document.getElementById("spotDest").innerHTML = "Nächster Spot bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
             watchId = navigator.geolocation.watchPosition(function(position) {
                 watchSuccess(position, nextSpot);
             }, watchError);
