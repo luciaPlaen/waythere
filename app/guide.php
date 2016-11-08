@@ -50,17 +50,17 @@
     
     <script>
         
+        
         // Abfragen der Koordinaten jedes zur Route gehörigen Spots >> Speichern der Werte in 2 Arrays (Latitude & Longitude) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird der einfacheren Handhabung halber ein Anfangswert (0) mitgegeben, um diesen Umstand zu erreichen)
         var spotsLatitude = [0];
         var spotsLongitude = [0];
-        for (spot = 1; spot <= <?php echo $lastSpot; ?>; spot++){
-            <?php
-                $spotCoordinates = mysqli_fetch_array(get_spot_coordinates($route_id, $spotCount), MYSQLI_ASSOC);
-                $spotCount = $spotCount + 1;
-            ?>
-            spotsLatitude.push(<?php echo $spotCoordinates['latitude']; ?>);
-            spotsLongitude.push(<?php echo $spotCoordinates['longitude']; ?>);
-        }
+        <?php
+            $all_spot_coordinates = get_all_spot_coordinates($route_id);
+            while ($line = mysqli_fetch_array($all_spot_coordinates, MYSQLI_ASSOC)) { ?>
+                spotsLatitude.push(<?php echo $line['latitude']; ?>);
+                spotsLongitude.push(<?php echo $line['longitude']; ?>);
+        <?php
+            } ?>
         document.getElementById("testing").innerHTML = "Lat = "+spotsLatitude+"Long = "+spotsLongitude;
         
         
@@ -109,7 +109,6 @@
          }, function() {
             document.getElementById("geolocation_error").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
         });
-        
         
         
         
