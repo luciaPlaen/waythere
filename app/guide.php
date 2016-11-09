@@ -36,7 +36,9 @@
     <h1> Routenführung </h1>
     <br>
     <p id = "spotDest"></p>
+    <p id = "spotTitel"></p>
     <br>
+    <p id = "preinstruction"></p>
     <p id = "posLat"></p>
     <p id = "posLong"></p>
     <br>
@@ -48,14 +50,19 @@
     <script>
         
         
-        // Abfragen der Koordinaten jedes zur Route gehörigen Spots >> Speichern der Werte in 2 Arrays (Latitude & Longitude) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird der einfacheren Handhabung halber ein Anfangswert (0) mitgegeben, um diesen Umstand zu erreichen)
+        // Abfragen der Informationen jedes zur Route gehörigen Spots >> Speichern der Werte in Arrays (Latitude & Longitude & Titel & Pre-instruction) >> der Index entspricht jeweils der Spot-Nummerierung (dem Array wird deshalb ein Anfangswert (0) mitgegeben)
         var spotsLatitude = [0];
         var spotsLongitude = [0];
+        var spotsTitel = [0];
+        var spotsPreInstructions = [0];
+        
         <?php
-            $all_spot_coordinates = get_all_spot_coordinates($route_id);
-            while ($line = mysqli_fetch_array($all_spot_coordinates, MYSQLI_ASSOC)) { ?>
+            $all_spot_informations = get_all_spot_informations($route_id);
+            while ($line = mysqli_fetch_array($all_spot_informations, MYSQLI_ASSOC)) { ?>
                 spotsLatitude.push(<?php echo $line['latitude']; ?>);
                 spotsLongitude.push(<?php echo $line['longitude']; ?>);
+                spotsTitel.push("<?php echo $line['spot_titel']; ?>");
+                spotsPreInstructions.push("<?php echo $line['pre_instruction']; ?>");
         <?php
             } ?>
         
@@ -91,6 +98,8 @@
             
             } else {
                 alert ("Position stimmt mit Ziel überein!");
+                document.getElementById("spotTitel").innerHTML = spotsTitel[nextSpot];
+                document.getElementById("preinstructions").innerHTML = spotsPreInstructions[nextSpot];
                 alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
                 
                 if (nextSpot == <?php echo $lastSpot; ?>) {

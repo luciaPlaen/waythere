@@ -65,12 +65,20 @@ function get_spot_coordinates($route_id, $position) {
 }
 
 // Abfrage der Koordinaten aller Spots einer Route
-function get_all_spot_coordinates($route_id) {
+function get_all_spot_informations($route_id) {
     
-    $sql = "SELECT Spot.latitude, Spot.longitude FROM Spot, belongsto ";
+    $sql = "SELECT Spot.latitude, Spot.longitude, Spot.spot_titel, Spot.pre_instruction FROM Spot, belongsto ";
     $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id ";
     $sqli .= "ORDER BY belongsto.number;";
     return get_result($sql);
+}
+
+// Abfrage des Titels und der Pre-Instruction eines Spots
+function get_spot_informations($route_id, $spot_number) {
+    
+    $sql =  "SELECT Spot.spot_titel, Spot.pre_instruction FROM Spot, belongsto ";
+    $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.number = $spot_number AND belongsto.spot_id = Spot.spot_id;";
+    return mysqli_fetch_array(get_result($sql));
 }
 
 // Abfragen der Spezifikationen für die Google API
