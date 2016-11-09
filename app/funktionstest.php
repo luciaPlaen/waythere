@@ -39,7 +39,7 @@
 
 <body>
     
-    <h1> Routenführung </h1>
+    <h1> Funktionstest </h1>
     <br>
     <p id = "posLat">posLat</p>
     <p id = "posLong">posLong</p>

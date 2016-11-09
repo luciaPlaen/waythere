@@ -31,6 +31,7 @@
     <a href ="/index.php">zurück</a>
 
     <h1><?php echo $route['name'];?></h1>
+    <br>
     <img src ="..<?php echo $route['image'];?>">
     <p><?php echo $route['description'];?></p>
     <p><?php echo $route['durance_minutes'];?> Minuten</p>
