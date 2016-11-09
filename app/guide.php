@@ -35,15 +35,12 @@
     
     <h1> Routenführung </h1>
     <br>
-    <p id = "geolocation_error"></p>
-    <p id = "testing"></p>
-    <p id = "posLat">posLat</p>
-    <p id = "posLong">posLong</p>
-    <p id = "destLat">destLat</p>
-    <p id = "destLong">destLong</p>
-    <p id = "request">http-request ...</p>
-    <p id = "xml">xml ...</p>
-    
+    <p id = "spotDest"></p>
+    <br>
+    <p id = "posLat"></p>
+    <p id = "posLong"></p>
+    <br>
+    <p id = "instruction"></p>
     <br>
     <a href ="route.php">abbrechen</a>
     
@@ -61,18 +58,37 @@
                 spotsLongitude.push(<?php echo $line['longitude']; ?>);
         <?php
             } ?>
-        document.getElementById("testing").innerHTML = "Lat = "+spotsLatitude+"Long = "+spotsLongitude;
         
         
         function watchSuccess(position, nextSpot) {
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
-            document.getElementById("posLat").innerHTML = positionLatitude;
-            document.getElementById("posLong").innerHTML = positionLongitude;
+            document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
+            document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
             console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
 
+            request = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination="+spotsLatitude[nextSpot]+","+spotsLongitude[nextSpot]+"&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
+            // console.log(request);
+            
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var xml =this.responseText;
+                    console.log("XML-Datei empfangen!");
+                        
+                    parser = new DOMParser();
+                    xmlDoc = parser.parseFromString(xml,"text/xml");    
+                }
+            };
+            xhttp.open("GET", "xml_request.php?url="+request, false);
+            xhttp.send();
+            
+            // Vergleichen >> PUFFERZONE BERÜCKSICHTIGEN !!! (Distanz von Position zu Ziel berechnen (haversine) und wenn Distanz kleiner als ...)
+            
             if (positionLatitude != spotsLatitude[nextSpot]) {
                 console.log ("Position stimmt nicht mit Ziel überein!");
+                document.getElementById("instruction").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
+            
             } else {
                 alert ("Position stimmt mit Ziel überein!");
                 alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
@@ -91,57 +107,30 @@
             console.warn('ERROR(' + error.code + '): ' + error.message);
         }
         
+        var geolocationOptions = {
+            enableHighAccuracy: false,
+            timeout: 20000,
+            maximumAge: 0
+        };
+        
         // eigentliche Funktion der Routenführung und Beginn der Schleife, die von Spot zu Spot navigiert
         function start_guide(nextSpot) {
             alert("Wir sind bei"+nextSpot);
-            document.getElementById("destLat").innerHTML = spotsLatitude[nextSpot];
-            document.getElementById("destLong").innerHTML = spotsLatitude[nextSpot];
+            document.getElementById("spotDest").innerHTML = "Nächster Spot bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
             watchId = navigator.geolocation.watchPosition(function(position) {
                 watchSuccess(position, nextSpot);
-            }, watchError);
+            }, watchError, geolocationOptions);
         }
     
         
         // Eine einmalige Standort-Abfrage wird durchgeführt, um die Zugriffsberechtigung gezielt abzufragen >> anschliessend startet die Routenführung (Funktion)
          navigator.geolocation.getCurrentPosition(function(position){
-             alert("Position konnte erfolgreich ermittelt werden.");
+             // alert("Position konnte erfolgreich ermittelt werden.");
+             var request;
              start_guide(1);
          }, function() {
-            document.getElementById("geolocation_error").innerHTML = "deine Position konnte leider nicht ermittelt werden.";
+            alert("deine Position konnte leider nicht ermittelt werden.");
         });
-        
-        
-        
-        
-        /*
-        function instruction() {
-            var step_counter = 0;
-            document.getElementById("xml").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[step_counter].childNodes[step_counter].nodeValue;        
-         }
-            
-            var apiRequest = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination=<?php //echo $destinationLatitude; ?>,<?php //echo $destinationLongitude; ?>&mode=<?php //echo $api_settings[1]; ?>&language=<?php //echo $api_settings[2]; ?>&key=<?php //echo $api_settings[0]; ?>";
-            document.getElementById("request").innerHTML = apiRequest;
-            
-
-            var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-
-                        var xml =this.responseText;
-                        console.log(xml);
-                        // document.getElementById("xml").innerHTML = "empfangen!";
-                        
-                        parser = new DOMParser();
-                        xmlDoc = parser.parseFromString(xml,"text/xml");
-
-                        instruction();
-                        
-                    }
-                };
-                xhttp.open("GET", "xml_request.php?url="+apiRequest, true);
-                xhttp.send();
-
-        */
         
     </script>
     
