@@ -67,7 +67,7 @@
             } ?>
         
         
-        function watchSuccess(position, nextSpot) {
+        function watchSuccess(position, nextSpot, destLatPlus, destLatMinus, destLongPlus, destLongMinus, watchId) {
             var positionLatitude = position.coords.latitude;
             var positionLongitude = position.coords.longitude;
             document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
@@ -92,23 +92,37 @@
             
             // Vergleichen >> PUFFERZONE BERÜCKSICHTIGEN !!! (Distanz von Position zu Ziel berechnen (haversine) und wenn Distanz kleiner als ...)
             
-            if (positionLatitude != spotsLatitude[nextSpot]) {
-                console.log ("Position stimmt nicht mit Ziel überein!");
-                document.getElementById("instruction").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
+           // if (positionLatitude == spotsLatitude[nextSpot]) {      // if-Bedingugng anpassen, sodass ein Puffer berücksichtigt wird
+            // if (positionLatitude < spotsLatitude[nextSpot]+0.0003 && positionLatitude > spotsLatitude[nextSpot]-0.0003 && positionLongitude < spotsLongitude[nextSpot]+0.0003 && positionLongitude > spotsLongitude[nextSpots]-0.0003) {
             
-            } else {
+            if (positionLatitude < destLatPlus && positionLatitude > destLatMinus && positionLongitude < destLongPlus && positionLongitude > destLongMinus) {
+                
+                navigator.geolocation.clearWatch(watchId);
                 alert ("Position stimmt mit Ziel überein!");
+                document.getElementById("spotDest").innerHTML = "";
                 document.getElementById("spotTitel").innerHTML = spotsTitel[nextSpot];
-                document.getElementById("preinstructions").innerHTML = spotsPreInstructions[nextSpot];
+                document.getElementById("preinstruction").innerHTML = spotsPreInstructions[nextSpot];
+                document.getElementById("posLat").innerHTML = "";
+                document.getElementById("posLong").innerHTML = "";
+                document.getElementById("instruction").innerHTML = "";
+
                 alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
+                // Richtige / Tatsächliche Audio-Ausgabe
+                
+                // Abfangen des Events bei Abspiel-Ende des Audio-Beitrages ...
                 
                 if (nextSpot == <?php echo $lastSpot; ?>) {
                     alert("die Routenführung ist beendet!");
                 } else {
+                    document.getElementById("spotTitel").innerHTML = "";
+                    document.getElementById("preinstruction").innerHTML = "";
                     nextSpot = nextSpot + 1;
-                    clearWatch(watchId);
                     start_guide(nextSpot);
                 }
+            
+            } else {
+                console.log ("Position stimmt nicht mit Ziel überein!");
+                document.getElementById("instruction").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
             }
         }
         
@@ -117,17 +131,24 @@
         }
         
         var geolocationOptions = {
-            enableHighAccuracy: false,
+            enableHighAccuracy: true,
             timeout: 20000,
             maximumAge: 0
         };
         
         // eigentliche Funktion der Routenführung und Beginn der Schleife, die von Spot zu Spot navigiert
         function start_guide(nextSpot) {
-            alert("Wir sind bei"+nextSpot);
+            // alert("Wir sind bei"+nextSpot);
             document.getElementById("spotDest").innerHTML = "Nächster Spot bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
-            watchId = navigator.geolocation.watchPosition(function(position) {
-                watchSuccess(position, nextSpot);
+            
+            var destLatPlus = spotsLatitude[nextSpot] + 0.0003;
+            var destLatMinus = spotsLatitude[nextSpot] - 0.0003;
+            var destLongPlus = spotsLongitude[nextSpot] + 0.0003;
+            var destLongMinus = spotsLongitude[nextSpot] - 0.0003;
+            // alert ("Die Pufferzone wurde zwischen : "+destLatPlus+" ; "+destLatMinus+" ; "+destLongPlus+" ; "+destLongMinus+" festgelegt");
+            
+            var watchId = navigator.geolocation.watchPosition(function(position) {
+                watchSuccess(position, nextSpot, destLatPlus, destLatMinus, destLongPlus, destLongMinus, watchId);
             }, watchError, geolocationOptions);
         }
     
