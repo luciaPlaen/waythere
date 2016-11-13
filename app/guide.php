@@ -39,10 +39,12 @@
     <p id = "spotTitel"></p>
     <br>
     <p id = "preinstruction"></p>
+    <button id = "ok" hidden>Ja, kann losgehen!</button>
     <p id = "posLat"></p>
     <p id = "posLong"></p>
     <br>
     <p id = "instruction"></p>
+    <audio id = "audio" autoplay = "autoplay"></audio>
     <br>
     <a href ="route.php">abbrechen</a>
     
@@ -55,6 +57,7 @@
         var spotsLongitude = [0];
         var spotsTitel = [0];
         var spotsPreInstructions = [0];
+        var spotsMediaFilePath = [0];
         
         <?php
             $all_spot_informations = get_all_spot_informations($route_id);
@@ -63,6 +66,7 @@
                 spotsLongitude.push(<?php echo $line['longitude']; ?>);
                 spotsTitel.push("<?php echo $line['spot_titel']; ?>");
                 spotsPreInstructions.push("<?php echo $line['pre_instruction']; ?>");
+                spotsMediaFilePath.push("<?php echo $line['file_name']; ?>");
         <?php
             } ?>
         
@@ -72,7 +76,7 @@
             var positionLongitude = position.coords.longitude;
             document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
             document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
-            console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
+            // console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
 
             request = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination="+spotsLatitude[nextSpot]+","+spotsLongitude[nextSpot]+"&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
             // console.log(request);
@@ -81,7 +85,7 @@
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     var xml =this.responseText;
-                    console.log("XML-Datei empfangen!");
+                    // console.log("XML-Datei empfangen!");
                         
                     parser = new DOMParser();
                     xmlDoc = parser.parseFromString(xml,"text/xml");    
@@ -90,41 +94,47 @@
             xhttp.open("GET", "xml_request.php?url="+request, false);
             xhttp.send();
             
-            // Vergleichen >> PUFFERZONE BERÜCKSICHTIGEN !!! (Distanz von Position zu Ziel berechnen (haversine) und wenn Distanz kleiner als ...)
-            
-           // if (positionLatitude == spotsLatitude[nextSpot]) {      // if-Bedingugng anpassen, sodass ein Puffer berücksichtigt wird
-            // if (positionLatitude < spotsLatitude[nextSpot]+0.0003 && positionLatitude > spotsLatitude[nextSpot]-0.0003 && positionLongitude < spotsLongitude[nextSpot]+0.0003 && positionLongitude > spotsLongitude[nextSpots]-0.0003) {
-            
+            // Vergleich der aktuellen Position mit den Koordinaten des nächsten Spot-Zieles :
             if (positionLatitude < destLatPlus && positionLatitude > destLatMinus && positionLongitude < destLongPlus && positionLongitude > destLongMinus) {
                 
                 navigator.geolocation.clearWatch(watchId);
-                alert ("Position stimmt mit Ziel überein!");
+                // alert ("Position stimmt mit Ziel überein!");
                 document.getElementById("spotDest").innerHTML = "";
                 document.getElementById("spotTitel").innerHTML = spotsTitel[nextSpot];
-                document.getElementById("preinstruction").innerHTML = spotsPreInstructions[nextSpot];
+                document.getElementById("preinstruction").innerHTML = "Ziel erreicht! <br>"+spotsPreInstructions[nextSpot];
+                document.getElementById("ok").removeAttribute("hidden");
                 document.getElementById("posLat").innerHTML = "";
                 document.getElementById("posLong").innerHTML = "";
                 document.getElementById("instruction").innerHTML = "";
 
-                alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt.");
-                // Richtige / Tatsächliche Audio-Ausgabe
+                document.getElementById("ok").onclick = function() {
                 
-                // Abfangen des Events bei Abspiel-Ende des Audio-Beitrages ...
+                    var audioFilePath = "../files/audio_inputs/"+spotsMediaFilePath[nextSpot];
+                    // alert("Jetzt wird der "+nextSpot+". Beitrag abgespielt ("+audioFilePath+").");
+                    document.getElementById("audio").src = audioFilePath;
+                    document.getElementById("audio").load();
                 
-                if (nextSpot == <?php echo $lastSpot; ?>) {
-                    alert("die Routenführung ist beendet!");
-                } else {
-                    document.getElementById("spotTitel").innerHTML = "";
-                    document.getElementById("preinstruction").innerHTML = "";
-                    nextSpot = nextSpot + 1;
-                    start_guide(nextSpot);
+                    // Abfangen des Events bei Abspiel-Ende des Audio-Beitrages :
+                    document.getElementById("audio").onended = function() {
+                        // alert("Audio fertig !");
+                        if (nextSpot == <?php echo $lastSpot; ?>) {
+                            alert("die Routenführung ist beendet!");
+                        } else {
+                            document.getElementById("spotTitel").innerHTML = "";
+                            document.getElementById("preinstruction").innerHTML = "";
+                            document.getElementById("ok").setAttribute("hidden");
+                            nextSpot = nextSpot + 1;
+                            start_guide(nextSpot);
+                        }
+                    };
                 }
             
             } else {
-                console.log ("Position stimmt nicht mit Ziel überein!");
+                // console.log ("Position stimmt nicht mit Ziel überein!");
                 document.getElementById("instruction").innerHTML = xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
             }
         }
+
         
         function watchError(error) {
             console.warn('ERROR(' + error.code + '): ' + error.message);

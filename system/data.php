@@ -67,8 +67,8 @@ function get_spot_coordinates($route_id, $position) {
 // Abfrage der Koordinaten aller Spots einer Route
 function get_all_spot_informations($route_id) {
     
-    $sql = "SELECT Spot.latitude, Spot.longitude, Spot.spot_titel, Spot.pre_instruction FROM Spot, belongsto ";
-    $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id ";
+    $sql = "SELECT Spot.latitude, Spot.longitude, Spot.spot_titel, Spot.pre_instruction, Media.file_name FROM Spot, belongsto, Media ";
+    $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id AND belongsto.spot_id = Media.spot_id ";
     $sqli .= "ORDER BY belongsto.number;";
     return get_result($sql);
 }
