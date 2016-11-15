@@ -7,7 +7,7 @@ data.php ist eine Sammlung aller wiederkehrend verwendeter Funktionen, was den V
 
 // Verbindung zur Datenbank:
 function get_db_connection() {
-		$db = mysqli_connect('localhost', '555712_3_1', 'bWvrijhZ@1cI', '555712_3_1')         //>> (server, user, pw, db)
+		$db = mysqli_connect('beburkar.mysql.db.internal', 'beburkar_bealu', 'x1tbv5Bq', 'beburkar_waythere')         //>> (server, user, pw, db)
  		 or die('Verbindung mit Datenbank-Server fehlgeschlagen.');
   		//mysqli_query($db, "SET NAMES 'utf8'");
 		return $db;
@@ -50,12 +50,35 @@ function get_route_tags($id) {
     return get_result($sql);
 }
 
+function count_spots($route_id){
+    $sql = "SELECT COUNT(belongsto.spot_id) FROM belongsto WHERE belongsto.route_id = $route_id;";
+    $count = mysqli_fetch_array(get_result($sql));
+    return $count[0]; 
+}
+
 // Abfragen der Koordinaten eines Spots
 function get_spot_coordinates($route_id, $position) {
     
     $sql = "SELECT Spot.latitude, Spot.longitude FROM Spot, belongsto ";
     $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id AND belongsto.number = $position;";
     return get_result($sql);
+}
+
+// Abfrage der Koordinaten aller Spots einer Route
+function get_all_spot_informations($route_id) {
+    
+    $sql = "SELECT Spot.latitude, Spot.longitude, Spot.spot_titel, Spot.pre_instruction, Media.file_name FROM Spot, belongsto, Media ";
+    $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.spot_id = Spot.spot_id AND belongsto.spot_id = Media.spot_id ";
+    $sqli .= "ORDER BY belongsto.number;";
+    return get_result($sql);
+}
+
+// Abfrage des Titels und der Pre-Instruction eines Spots
+function get_spot_informations($route_id, $spot_number) {
+    
+    $sql =  "SELECT Spot.spot_titel, Spot.pre_instruction FROM Spot, belongsto ";
+    $sql .= "WHERE belongsto.route_id = $route_id AND belongsto.number = $spot_number AND belongsto.spot_id = Spot.spot_id;";
+    return mysqli_fetch_array(get_result($sql));
 }
 
 // Abfragen der Spezifikationen für die Google API
