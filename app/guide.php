@@ -41,12 +41,17 @@
         <p id = "spotTitel"></p>
         <br>
         <p id = "preinstruction"></p>
-        <button id = "ok" hidden>Ja, kann losgehen!</button>
+        <button id = "ok" hidden>Bereit? Kann losgehen!</button>
+        <img src = "../files/headphones.png" id = "audioIcon" hidden></img>
         <p id = "posLat"></p>
         <p id = "posLong"></p>
         <br>
         <p id = "instruction"></p>
+        <p id = "instructionNext1" style = "color: rgb(130, 130, 130)"></p>
+        <p id = "instructionNext2" style = "color: rgb(200, 200, 200)"></p>
+        <br>
         <audio id = "audio" autoplay = "autoplay"></audio>
+        <button id = "skipSpot" hidden>Spot überspringen</button>
         <br>
         <a href ="route.php">abbrechen</a>
     </div>
@@ -78,10 +83,11 @@
             var positionLongitude = position.coords.longitude;
             document.getElementById("posLat").innerHTML = "PositionLatitude: "+positionLatitude;
             document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
+            document.getElementById("posLong").innerHTML = "PositionLongitude: "+positionLongitude;
             // console.log("Position wurde aktualisiert zu: Latitude: "+positionLatitude+" & Longitude: "+positionLongitude);
             // der http-Request für Google Maps wird mit den dynamischen Informationen bestückt und zu einer Variable zusammengestellt
             request = "https://maps.googleapis.com/maps/api/directions/xml?origin="+positionLatitude+","+positionLongitude+"&destination="+spotsLatitude[nextSpot]+","+spotsLongitude[nextSpot]+"&mode=<?php echo $api_settings[1]; ?>&language=<?php echo $api_settings[2]; ?>&key=<?php echo $api_settings[0]; ?>";
-            // console.log(request);
+            console.log(request);
             // der Request wird erstellt :
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
@@ -103,18 +109,20 @@
                 navigator.geolocation.clearWatch(watchId);
                 // alert ("Position stimmt mit Ziel überein!");
                 document.getElementById("spotDest").innerHTML = "";
-                document.getElementById("spotTitel").innerHTML = spotsTitel[nextSpot];
                 document.getElementById("preinstruction").innerHTML = "Ziel erreicht! <br>"+spotsPreInstructions[nextSpot];
                 document.getElementById("ok").removeAttribute("hidden");
                 document.getElementById("posLat").innerHTML = "";
                 document.getElementById("posLong").innerHTML = "";
                 document.getElementById("instruction").innerHTML = "";
+                document.getElementById("instructionNext1").innerHTML = "";
                 // ein Button "ok" wird eingeblendet, durch den der User sich für den Beitrag bereit erklären kann (als Bestätigung nach der Pre-Instruction)
                 document.getElementById("ok").onclick = function() {
                     
                     // der Datei-Pfad für den richtigen Audio-Beitrag wird zusammengestellt
                     var audioFilePath = "../files/audio_inputs/"+spotsMediaFilePath[nextSpot];
                     // das bereits vorbereitete HTML-Element wird mit der richtigen src versehen und erneut geladen (autoplay)
+                    document.getElementById("ok").setAttribute("hidden");
+                    destLatMinusocument.getElementById("audioIcon").removeAttribute("hidden");
                     document.getElementById("audio").src = audioFilePath;
                     document.getElementById("audio").load();
                 
@@ -128,7 +136,7 @@
                         } else {        // wenn nein, werden die Anzeige-Informationen wiederhergestellt
                             document.getElementById("spotTitel").innerHTML = "";
                             document.getElementById("preinstruction").innerHTML = "";
-                            document.getElementById("ok").setAttribute("hidden");
+                            document.getElementById("audioIcon").setAttribute("hidden");
                             // der Spot-Zähler wird aktualisiert
                             nextSpot = nextSpot + 1;
                             // und die Routenführung zum nächsten Spot aufgerufen / gestartet
@@ -139,7 +147,9 @@
             
             } else {      // wenn die aktuelle Position noch NICHT mit den Spot-Ziel-Koordinaten übereinstimmt
                 // console.log ("Position stimmt nicht mit Ziel überein!");
-                document.getElementById("instruction").innerHTML = "In "+xmlDoc.getElementsByTagName("value")[1].childNodes[0].nodeValue+" Metern : <br>"+xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
+                document.getElementById("instruction").innerHTML = "In "+xmlDoc.getElementsByTagName("value")[1].childNodes[0].nodeValue+" Metern : "+xmlDoc.getElementsByTagName("html_instructions")[0].childNodes[0].nodeValue;
+                document.getElementById("instructionNext1").innerHTML = "Danach in "+xmlDoc.getElementsByTagName("value")[3].childNodes[0].nodeValue+" Metern : "+xmlDoc.getElementsByTagName("html_instructions")[1].childNodes[0].nodeValue;
+                document.getElementById("instructionNext2").innerHTML = "Danach in "+xmlDoc.getElementsByTagName("value")[5].childNodes[0].nodeValue+" Metern : "+xmlDoc.getElementsByTagName("html_instructions")[2].childNodes[0].nodeValue;
             }
         }       // Ende der Success-Funktion
 
@@ -158,20 +168,35 @@
         // Start der Routenführung zu einem bestimmten Spot
         function start_guide(nextSpot) {
             // alert("Beginn der Routenführung zu Spot "+nextSpot);
-            document.getElementById("spotDest").innerHTML = "Nächster Spot bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
+            document.getElementById("spotTitel").innerHTML = "Nächster Spot : "+spotsTitel[nextSpot];
+            document.getElementById("spotDest").innerHTML = "bei "+spotsLatitude[nextSpot]+" , "+spotsLongitude[nextSpot];
             // Definition der Pufferbereiche rund um die Ziel- / Spot-Koordinaten
             var destLatPlus = spotsLatitude[nextSpot] + 0.0003;
             var destLatMinus = spotsLatitude[nextSpot] - 0.0003;
             var destLongPlus = spotsLongitude[nextSpot] + 0.0003;
             var destLongMinus = spotsLongitude[nextSpot] - 0.0003;
             // alert ("Die Pufferzone wurde zwischen : "+destLatPlus+" ; "+destLatMinus+" ; "+destLongPlus+" ; "+destLongMinus+" festgelegt");
-            
+            document.getElementById("skipSpot").removeAttribute("hidden");
+            // Definition der onclick-Funktion des Skip-Buttons
+            document.getElementById("skipSpot").onclick = function() {
+                // Abfrage, ob der gerade durchgespielte Spot der letzte der Route war
+                if (nextSpot == <?php echo $lastSpot; ?>) {
+                    alert("die Routenführung ist beendet!");
+                } else {        // wenn nein, werden die Anzeige-Informationen wiederhergestellt
+                    document.getElementById("spotTitel").innerHTML = "";
+                    document.getElementById("preinstruction").innerHTML = "";
+                    document.getElementById("audioIcon").setAttribute("hidden");
+                    // der Spot-Zähler wird aktualisiert
+                    nextSpot = nextSpot + 1;
+                    // und die Routenführung zum nächsten Spot aufgerufen / gestartet
+                    start_guide(nextSpot);
+                }
+            }
             // Start von watchPosition >> alle erforderlichen Informationen (aktuelle Position, Ziel-Pufferbereiche, aktueller Spot) werden der Success-Funktion mitgegeben
             var watchId = navigator.geolocation.watchPosition(function(position) {
                 watchSuccess(position, nextSpot, destLatPlus, destLatMinus, destLongPlus, destLongMinus, watchId);
             }, watchError, geolocationOptions);
         }
-    
         
         // Eine einmalige Standort-Abfrage wird durchgeführt, um die Zugriffsberechtigung gezielt abzufragen >> anschliessend startet die Routenführung (Funktion)
          navigator.geolocation.getCurrentPosition(function(position){

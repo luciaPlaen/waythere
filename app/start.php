@@ -34,6 +34,8 @@
         <p>Prüfe den Akku deines Smartphones!</p>
         <p>Lege deine Kopfhörer an!</p>
         <br>
+        <p>Bitte achte während der Routenführung auf deine Umgebung!</p>
+        <br>
         <a href = "guide.php?id=<?php echo $route_id; ?>">UND LOS! (Routenführung starten)</a>
         <br>
         <br>
