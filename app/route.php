@@ -18,7 +18,8 @@
 <head>
     
     <!-- Links -->
-    <link href="../style/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../style/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../style/materialize/css/materialize.min.css">
     <link href="../style/style.css" rel="stylesheet" type="text/css">
 
     <meta charset="utf-8">
@@ -28,27 +29,27 @@
 
 <body>
     
-    <!-- Zusammenstellung von aus der Datenbank abgefragten Detail-Informationen zur entsprechenden Route-->
-    
-    <a href ="/index.php">zurück</a>
+    <div class="container">
+        <a href ="/index.php">zurück</a>
 
-    <h1><?php echo $route['name'];?></h1>
-    <br>
-    <img src ="..<?php echo $route['image'];?>">
-    <p><?php echo $route['description'];?></p>
-    <p><?php echo $route['durance_minutes'];?> Minuten</p>
-    <p><?php echo $route['distance_meter'];?> Meter</p>
-    
-    <?php $tags = get_route_tags($route_id); 
-    echo "<p>Tags : ";
-    while ($line = mysqli_fetch_array($tags)) {
-        echo $line['tag_name']." ";
-    }
-    echo "</p>";
-    ?>
-    
-    <a href = "start.php?id=<?php echo $route_id; ?>">Route starten</a>
-    
+        <!-- Zusammenstellung von aus der Datenbank abgefragten Detail-Informationen zur entsprechenden Route-->
+        <h1><?php echo $route['name'];?></h1>
+        <br>
+        <img src ="..<?php echo $route['image'];?>">
+        <p><?php echo $route['description'];?></p>
+        <p><?php echo $route['durance_minutes'];?> Minuten</p>
+        <p><?php echo $route['distance_meter'];?> Meter</p>
+
+        <?php $tags = get_route_tags($route_id); 
+        echo "<p>Tags : ";
+        while ($line = mysqli_fetch_array($tags)) {
+            echo $line['tag_name']." ";
+        }
+        echo "</p>";
+        ?>
+
+        <a href = "start.php?id=<?php echo $route_id; ?>">Route starten</a>
+    </div>
     
 </body>
 </html>

@@ -23,7 +23,8 @@
 <head>
     
     <!-- Links -->
-    <link href="../style/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../style/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../style/materialize/css/materialize.min.css">
     <link href="../style/style.css" rel="stylesheet" type="text/css">
 
     <meta charset="utf-8">
@@ -33,21 +34,22 @@
 
 <body>
     
-    <h1> Routenführung </h1>
-    <br>
-    <p id = "spotDest"></p>
-    <p id = "spotTitel"></p>
-    <br>
-    <p id = "preinstruction"></p>
-    <button id = "ok" hidden>Ja, kann losgehen!</button>
-    <p id = "posLat"></p>
-    <p id = "posLong"></p>
-    <br>
-    <p id = "instruction"></p>
-    <audio id = "audio" autoplay = "autoplay"></audio>
-    <br>
-    <a href ="route.php">abbrechen</a>
-    
+    <div class="container">
+        <h1> Routenführung </h1>
+        <br>
+        <p id = "spotDest"></p>
+        <p id = "spotTitel"></p>
+        <br>
+        <p id = "preinstruction"></p>
+        <button id = "ok" hidden>Ja, kann losgehen!</button>
+        <p id = "posLat"></p>
+        <p id = "posLong"></p>
+        <br>
+        <p id = "instruction"></p>
+        <audio id = "audio" autoplay = "autoplay"></audio>
+        <br>
+        <a href ="route.php">abbrechen</a>
+    </div>
     
     <script>
         
